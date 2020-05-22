@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+    <style>
+        #pn_container {
+          font-weight: none;
+          font-family: Ubuntu Light, Sans-Serif;
+          background-image: linear-gradient(to bottom right, black, rgb(19,25,68));
+        }
+
+        p#h1 {
+            font-size: 30px;
+            margin-top: 7px;
+            margin-bottom: 2px;
+            text-align: center;
+            color: white;
+
+        }
+        p#h2 { 
+            font-size: 18px;
+            margin-top: 0;
+            margin-bottom: 7px;
+            text-align: center;
+            color: white;
+        }
+        
+        .link {
+            fill: white;
+            stroke: grey;
+            stroke-width: 1.5px;
+        }
+        .path {
+            stroke: rgb(64,64,64);
+        }
+        
+        .node {
+          fill: rgb(1,118,190);
+          stroke: white;
+          stroke-width: 1.5px;
+        }
+        .clicked_node {
+            fill:green;
+            stroke: white;
+            stroke-width: 5px;
+        }
+        
+        .label {
+            color: white;
+        }
+        svg {
+            display: block;
+            margin: auto;
+            padding-top: 15px;
+        }
+        
+        #node_tooltip, #link_tooltip {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: auto;
+            visibility: hidden;
+            font-size: 10px;
+            background-color: white;
+            padding: 10px;
+            border-radius: 3px;
+            text-align: left;
+            color: black;
+            font-size: 14px;
+        }
+        #key{
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: auto;
+            visibility: hidden;
+            font-size: 10px;
+            background-color: transparent;
+            padding: 10px;
+            border-radius: 3px;
+            text-align: left;
+            color: rgb(144,144,144);
+            font-size: 14px;
+        }
+        .field {
+            fill: transparent;
+            stroke: rgb(60,60,60);
+            stroke-width: 4px;
+        }
+        p#tag {
+            font-weight: bold;
+            color: rgb(94,94,94);
+            text-align: center;
+            margin-top: 10px;
+            padding-bottom: 15px;
+        }
+        #france {
+            position: absolute;
+            right: 170px;
+            top: 10px;
+            width: 70px;
+        }
+        #wc_logo {
+            position: absolute;
+            left: 170px;
+            top: -10px;
+            width: 120px;
+        }
+
+
+    </style>
+    
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+
+    <script>
+    function vizInit() {
+
+        var links; // initiate variable for the links/passing data
+        var nodes; // initiate variable for the node/player data
+        
+        var width = d3.min([window.innerWidth-20,1265]) // scalable width based on window size
+        var height = width*.654 + 3 // scalable height for svg in proportion for pitch size
+        
+        
+        
+        function getData() {
+            // This function gets the data and calls the drawing functions
+            
+            draw_field(); // call the field-drawing function
+            
+            // attach the link data
+            d3.csv("player_links.csv", function(d) {
+                links = d;
+                draw_links(); // call the link-drawing function
+            });
+            
+            // attach the node data
+            d3.csv("player_nodes.csv", function(d) {
+                nodes = d;
+                draw_nodes(); // call the node-drawing function
+            });
+        }
+              
+        function draw_field(){
+            // This function draws all of the field elements
+            
+            // Set the width/height
+            d3.select("#networkChart")
+                .attr('width', width)
+                .attr('height', height);
+            
+            // Field Perimeter
+            d3.select("#networkChart").append("rect")
+                .attr("class", "field")
+                .attr("x", 1)
+                .attr("y", 1)
+                .attr("width", width-2)
+                .attr("height", width * .654);
+            // Midfield line
+            d3.select("#networkChart").append("rect")
+                .attr("class", "field")
+                .attr("x", 1)
+                .attr("y", 1)
+                .attr("width", (width-2)/2)
+                .attr("height", width * .654);
+            // 18-yard arc left
+            d3.select("#networkChart").append("path") //"line"
+                .attr("class", 'field')
+                .attr("d", function(d){
+                    x1 = (16.5/104)*width;
+                    y1 = (26.5/104)*width;
+                    x2 = (16.5/104)*width;
+                    y2 = y1 + (15/104)*width;
+                    xc = (16.5/104)*width + (7.56/104)*width;
+                    yc = (y1 + y2) / 2
+                    path = "M" + x1.toString() + "," + y1.toString() + " Q" + xc.toString() + "," + yc.toString() + " " + x2.toString() + "," + y2.toString();
+
+                    return path
+                })           
+            // 18-yard arc right
+            d3.select("#networkChart").append("path") //"line"
+                .attr("class", 'field')
+                .attr("d", function(d){
+                    x1 = (87.5/104)*width;
+                    y1 = (26.5/104)*width;
+                    x2 = (87.5/104)*width;
+                    y2 = y1 + (15/104)*width;
+                    xc = (87.5/104)*width - (7.56/104)*width;
+                    yc = (y1 + y2) / 2
+                    path = "M" + x1.toString() + "," + y1.toString() + " Q" + xc.toString() + "," + yc.toString() + " " + x2.toString() + "," + y2.toString();
+                    
+                    return path
+                })
+            // 18-yard box left
+            d3.select("#networkChart").append("rect")
+                .attr("class", "field")
+                .attr("x", 1)
+                .attr("y", (13.84/104)*width)
+                .attr("width", (16.5/104)*width)
+                .attr("height", (40.32/104)*width);
+            // 18-yard box right
+            d3.select("#networkChart").append("rect")
+                .attr("class", "field")
+                .attr("x", (87.5/104)*width)
+                .attr("y", (13.84/104)*width)
+                .attr("width", (16.5/104)*width)
+                .attr("height", (40.32/104)*width);
+            // 5-yard box left
+            d3.select("#networkChart").append("rect")
+                .attr("class", "field")
+                .attr("x", 1)
+                .attr("y", (24.84/104)*width)
+                .attr("width", (5.5/104)*width)
+                .attr("height", (18.32/104)*width);
+            // 5-yard box right
+            d3.select("#networkChart").append("rect")
+                .attr("class", "field")
+                .attr("x", (98.5/104)*width)
+                .attr("y", (24.84/104)*width)
+                .attr("width", (5.5/104)*width)
+                .attr("height", (18.32/104)*width);
+            // Center-Circle
+            d3.select("#networkChart").append("circle")
+                .attr("class", "field")
+                .attr("cx", width/2)
+                .attr("cy", (width*.654)/2)
+                .attr("r", (9.15/104)*width);
+            // Center mark
+            d3.select("#networkChart").append("circle")
+                .attr("class", "field")
+                .attr("cx", width/2)
+                .attr("cy", (width*.654)/2)
+                .attr("r", (.5/104)*width)
+                .style("fill","rgb(60,60,60)");
+            // Penalty mark left
+            d3.select("#networkChart").append("circle")
+                .attr("class", "field")
+                .attr("cx", (11/104)*width)
+                .attr("cy", (width*.654)/2)
+                .attr("r", (.5/104)*width)
+                .style("fill","rgb(60,60,60)");
+            // Penalty mark right
+            d3.select("#networkChart").append("circle")
+                .attr("class", "field")
+                .attr("cx", (93/104)*width)
+                .attr("cy", (width*.654)/2)
+                .attr("r", (.5/104)*width)
+                .style("fill","rgb(60,60,60)");
+            // Corner arc top left
+            d3.select("#networkChart").append("circle")
+                .attr("class", "field")
+                .attr("cx", 1)
+                .attr("cy", 1)
+                .attr("r", (2/104)*width);
+            // Corner arc bottom left
+            d3.select("#networkChart").append("circle")
+                .attr("class", "field")
+                .attr("cx", 1)
+                .attr("cy", width * .654)
+                .attr("r", (2/104)*width);
+            // Corner arc top right
+            d3.select("#networkChart").append("circle")
+                .attr("class", "field")
+                .attr("cx", width-2)
+                .attr("cy", 1)
+                .attr("r", (2/104)*width);
+            // Corner arc bottom right
+            d3.select("#networkChart").append("circle")
+                .attr("class", "field")
+                .attr("cx", width-2)
+                .attr("cy", width * .654)
+                .attr("r", (2/104)*width);
+            //key
+            d3.select("#key")
+                    .style("top", (width*.625) + "px")
+                    .style("left", function(){
+                        // dynamic placement of key based on window size
+                        if (width == 1265){
+                            return ((window.innerWidth - 1265) / 2) + width - 300  + "px";
+                        } else {
+                            return width * .77 + "px";
+                    }
+                
+            })
+                    .style("font-size", (width/1265) * 100 + "%")
+                    .style("visibility","visible");
+      
+        }
+        
+        function draw_links() {
+            // This function draws the links between the players
+            var svg = d3.select("#networkChart")
+                .attr('width', width)
+                .attr('height', height);
+            
+            var lines = svg.selectAll("path")
+                .data(links)
+                .enter()
+                .append("path")
+                .attr("class", 'link')
+                .attr("d", function(d){
+                    // function maps the xy coordinates to the path arc
+                    x1 = d['source_x'] * width;
+                    y1 = d['source_y'] * width * .654;
+                    x2 = d['target_x'] * width;
+                    y2 = d['target_y'] * width * .654;
+                    xc = (d['target_x']*width + d['source_x']*width) / 2;
+                    
+                    if ((d['target_y'] - d['source_y']) > 0){
+                        var offset = -70
+                    } else {
+                        var offset = 70
+                    }
+                    yc = ((d['target_y']* width * .654 + d['source_y']* width * .654) / 2) + offset;
+                    
+                    path = "M" + x1.toString() + "," + y1.toString() + " Q" + xc.toString() + "," + yc.toString() + " " + x2.toString() + "," + y2.toString();
+                    
+                    return path
+
+                })
+                .style("stroke-width",function(d){
+                    return ((d['pass_completed'] / 4) * 4)* width/1265;
+                })
+                .style("fill", "none")
+                .on("mouseover", handleMouseOver) // mouse over interaction
+                .on("mouseout", handleMouseOut); // mouse out interaction
+                 
+        }
+        
+        function draw_nodes(){
+            // This function draws the player nodes
+            
+            var svg = d3.select("#networkChart")
+                .attr('width', width)
+                .attr('height', height);
+            
+            var circles = svg.selectAll(".node")
+                .data(nodes)
+                .enter()
+                .append("circle")
+                .attr("class", 'node')
+                .attr("cx", function(d){
+                    return d['x_pos_perc'] * width;
+                } )
+                .attr("cy", function(d){
+                    return d['y_pos_perc'] * width * .654;
+                })
+                .attr("r", function(d){
+                    return d['centrality'] * ((width/1300) * 40);
+                })
+                .on("mouseover", handleMouseOver) // mouse over interaction
+                .on("mouseout", handleMouseOut) // mouse out interaction
+                .on("click", click_node); // click interaction
+                
+        
+        }
+        
+        var orig_fill; // initialize the reset fill color variable
+        var orig_stroke; // initialize the rest stroke color variable
+        function handleMouseOver(d){
+            // This function handles the node/link highlight and tooltip content on mouse over
+            if (d3.select(this).attr("class") == "node") {
+                // If the object hovered over is a node
+                
+                orig_fill = d3.select(this).style("fill"); // record original fill
+                
+                // Change the node properties
+                var circles = d3.select(this)
+                    .style("fill", "rgb(200,177,109)")
+                    .style("stroke-width", "5px");
+                
+                // Update the node tooltip content
+                d3.select("#playerName").text(d["name"]);
+                d3.select("#compPerc").text(d3.format(".0%")(d["comp_percentage"]));
+                d3.select("#passAtt").text(d["pass_attempts"]);
+                d3.select("#passComp").text(d["pass_completed"]);
+                
+                // Update the node tooltip properties
+                d3.select("#node_tooltip")
+                    .style("top", d3.event.pageY + 5 + "px")
+                    .style("left", d3.event.pageX + 5 + "px")
+                    .style("visibility","visible");
+                
+            } else if (d3.select(this).attr("class") == "link"){
+                // If the object hovered over is a link
+                
+                orig_stroke = d3.select(this).style("stroke"); // record original stroke
+                
+                // Change the link properties
+                var lines = d3.select(this)
+                    .style("stroke", "white")
+                
+                // Update the link tooltip content
+                d3.select("#passerNames").text(d["source"] + " --> " + d['target']);
+                d3.select("#compPercTog").text(d3.format(".0%")(d["comp_percentage"]));
+                d3.select("#passAttTog").text(d3.format(".0f")(d["pass_attempts"]));
+                d3.select("#passCompTog").text(d3.format(".0f")(d["pass_completed"]));
+
+                // Update the link tooltip properties
+                d3.select("#link_tooltip")
+                    .style("top", d3.event.pageY + 5 + "px")
+                    .style("left", d3.event.pageX + 5 + "px")
+                    .style("visibility","visible");
+            }
+        }
+
+        function handleMouseOut(){
+            // This function the resets node/link attributes and tooltip properties on mouse out
+            
+            if (d3.select(this).attr("class") == "node") {
+                // If the object hovered over is a node
+                var circles = d3.select(this)
+                    .style("fill", orig_fill)
+                    .style("stroke-width", "1.5px");
+                
+                d3.select("#node_tooltip")
+                    .style("visibility","hidden");
+                
+            } else if (d3.select(this).attr("class") == "link"){
+                // If the object hovered over is a link
+                var lines = d3.select(this)
+                    .style("stroke", orig_stroke);
+               
+                d3.select("#link_tooltip")
+                    .style("visibility","hidden");
+                
+            }
+
+        }
+        
+        function click_node(d){
+            // This function handles the interaction elements when a node is clicked. It highlights the selected node, nodes that that player has passed to, and the links connecting them. It also greys-out nodes and links unrelated to the selected node/player. Clicking the same node twice resets the node attributes.
+            
+            d3.selectAll(".clicked_node").style("fill","grey");
+            d3.selectAll(".node").style("fill","grey");
+            d3.selectAll(".link").style("stroke","grey");
+            
+            if (d3.select(this).attr("class") == "node") {
+                d3.selectAll(".node")
+                    .style("fill", "grey");
+                d3.selectAll(".clicked_node")
+                    .attr("class", "node")
+                    .style("fill", "grey")
+                    .style("stroke-width", "1.5px");
+                d3.select(this)
+                    .attr("class", "clicked_node")
+                    .style("fill","rgb(200,177,109)")
+                    .style("stroke-width", "5px");
+                
+                var name = d['name'];
+                var target = [];
+                
+                var lines = d3.selectAll(".link").style("stroke", function(d){
+                    if (d['source'] == name){
+                        target.push(d['target']);
+                        return "rgb(200,177,109)";
+                    } else {
+                        return 'rgb(50,50,50)';
+                    }
+                    
+                });
+                
+                target_highlight(d,target);
+                
+
+            } else {
+                var circles = d3.select(this)
+                    .attr("class", "node")
+                    .style("fill","rgb(1,118,190)");
+                
+                var circles = d3.selectAll(".node")
+                    .attr("class", "node")
+                    .style("fill","rgb(1,118,190)");
+            }
+        }
+        
+        function target_highlight(d,target){
+            // This function handles the formatting of the target nodes when a source node is clicked
+            
+            d3.selectAll(".node")
+                .style("fill", function(d){
+                    if (target.includes(d["name"])){
+                        return "rgb(1,118,190)";
+                    } else {
+                        return "rgb(50,50,50)";
+                    }
+                    });
+
+        }
+        getData();
+    };
+    
+    window.onload = function() {
+        vizInit();
+    };
+
+    window.onresize = function() {
+        d3.select("#networkChart").selectAll("*").remove();
+       vizInit();
+      };
+        
+    </script>
+<title>France Passing Network</title>
+</head>
+
+<body>
+    <div id="pn_container">
+    
+        <p id="h1">France Interactive Passing Network</p>
+        <p id="h2">How France moved the ball around during their 2018 World Cup-winning match against Croatia</p>
+
+
+        <svg id="networkChart" width="1200" height="1200">
+
+        </svg>
+
+        <div id= 'node_tooltip' > 
+            <span id="playerName" style="font-weight: bold">PLACEHOLDER NAME</span><br />
+            Completion %: <span id="compPerc"></span><br />
+            Pass Attemps: <span id="passAtt"></span><br />
+            Pass Completions: <span id="passComp"></span><br />    
+        </div>
+        <div id= 'link_tooltip' > 
+            <span id="passerNames" style="font-weight: bold">PLACEHOLDER NAME --> NAME</span><br />
+            Completion %: <span id="compPercTog"></span><br />
+            Pass Attemps: <span id="passAttTog"></span><br />
+            Pass Completions: <span id="passCompTog"></span><br /> 
+        </div>
+        <div id='key'>
+            <span style="font-weight: bold">KEY</span><br />
+            <span>Attacking Direction: --></span><br />
+            <span>Location: pass origin</span><br />
+            <span>Size: number of completed passes</span><br />
+
+        </div>
+        <p id="tag"> Ryan Ferrera | Twitter: @RyanFerrera | Data: StatsBomb</p>
+        
+     </div>
+</body>
+</html>
