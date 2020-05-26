@@ -128,13 +128,13 @@
             draw_field(); // call the field-drawing function
             
             // attach the link data
-            d3.csv("player_links.csv", function(d) {
+            d3.csv("https://raw.githubusercontent.com/rferrera/D3-Passing-Network/master/player_links.csv", function(d) {
                 links = d;
                 draw_links(); // call the link-drawing function
             });
             
             // attach the node data
-            d3.csv("player_nodes.csv", function(d) {
+            d3.csv("https://raw.githubusercontent.com/rferrera/D3-Passing-Network/master/player_nodes.csv", function(d) {
                 nodes = d;
                 draw_nodes(); // call the node-drawing function
             });
