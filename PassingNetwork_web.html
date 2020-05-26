@@ -154,14 +154,16 @@
                 .attr("x", 1)
                 .attr("y", 1)
                 .attr("width", width-2)
-                .attr("height", width * .654);
+                .attr("height", width * .654)
+                .style("stroke-width", (width/1265) * 4 + "px");
             // Midfield line
             d3.select("#networkChart").append("rect")
                 .attr("class", "field")
                 .attr("x", 1)
                 .attr("y", 1)
                 .attr("width", (width-2)/2)
-                .attr("height", width * .654);
+                .attr("height", width * .654)
+                .style("stroke-width", (width/1265) * 4 + "px");
             // 18-yard arc left
             d3.select("#networkChart").append("path") //"line"
                 .attr("class", 'field')
@@ -175,7 +177,8 @@
                     path = "M" + x1.toString() + "," + y1.toString() + " Q" + xc.toString() + "," + yc.toString() + " " + x2.toString() + "," + y2.toString();
 
                     return path
-                })           
+                })
+                .style("stroke-width", (width/1265) * 4 + "px");
             // 18-yard arc right
             d3.select("#networkChart").append("path") //"line"
                 .attr("class", 'field')
@@ -190,85 +193,98 @@
                     
                     return path
                 })
+                .style("stroke-width", (width/1265) * 4 + "px");
             // 18-yard box left
             d3.select("#networkChart").append("rect")
                 .attr("class", "field")
                 .attr("x", 1)
                 .attr("y", (13.84/104)*width)
                 .attr("width", (16.5/104)*width)
-                .attr("height", (40.32/104)*width);
+                .attr("height", (40.32/104)*width)
+                .style("stroke-width", (width/1265) * 4 + "px");
             // 18-yard box right
             d3.select("#networkChart").append("rect")
                 .attr("class", "field")
                 .attr("x", (87.5/104)*width)
                 .attr("y", (13.84/104)*width)
                 .attr("width", (16.5/104)*width)
-                .attr("height", (40.32/104)*width);
+                .attr("height", (40.32/104)*width)
+                .style("stroke-width", (width/1265) * 4 + "px");
             // 5-yard box left
             d3.select("#networkChart").append("rect")
                 .attr("class", "field")
                 .attr("x", 1)
                 .attr("y", (24.84/104)*width)
                 .attr("width", (5.5/104)*width)
-                .attr("height", (18.32/104)*width);
+                .attr("height", (18.32/104)*width)
+                .style("stroke-width", (width/1265) * 4 + "px");
             // 5-yard box right
             d3.select("#networkChart").append("rect")
                 .attr("class", "field")
                 .attr("x", (98.5/104)*width)
                 .attr("y", (24.84/104)*width)
                 .attr("width", (5.5/104)*width)
-                .attr("height", (18.32/104)*width);
+                .attr("height", (18.32/104)*width)
+                .style("stroke-width", (width/1265) * 4 + "px");
             // Center-Circle
             d3.select("#networkChart").append("circle")
                 .attr("class", "field")
                 .attr("cx", width/2)
                 .attr("cy", (width*.654)/2)
-                .attr("r", (9.15/104)*width);
+                .attr("r", (9.15/104)*width)
+                .style("stroke-width", (width/1265) * 4 + "px");
             // Center mark
             d3.select("#networkChart").append("circle")
                 .attr("class", "field")
                 .attr("cx", width/2)
                 .attr("cy", (width*.654)/2)
                 .attr("r", (.5/104)*width)
-                .style("fill","rgb(60,60,60)");
+                .style("fill","rgb(60,60,60)")
+                .style("stroke-width", (width/1265) * 4 + "px");
             // Penalty mark left
             d3.select("#networkChart").append("circle")
                 .attr("class", "field")
                 .attr("cx", (11/104)*width)
                 .attr("cy", (width*.654)/2)
                 .attr("r", (.5/104)*width)
-                .style("fill","rgb(60,60,60)");
+                .style("fill","rgb(60,60,60)")
+                .style("stroke-width", (width/1265) * 4 + "px");
             // Penalty mark right
             d3.select("#networkChart").append("circle")
                 .attr("class", "field")
                 .attr("cx", (93/104)*width)
                 .attr("cy", (width*.654)/2)
                 .attr("r", (.5/104)*width)
-                .style("fill","rgb(60,60,60)");
+                .style("fill","rgb(60,60,60)")
+                .style("stroke-width", (width/1265) * 4 + "px");
             // Corner arc top left
             d3.select("#networkChart").append("circle")
                 .attr("class", "field")
                 .attr("cx", 1)
                 .attr("cy", 1)
-                .attr("r", (2/104)*width);
+                .attr("r", (2/104)*width)
+                .style("stroke-width", (width/1265) * 4 + "px");
             // Corner arc bottom left
             d3.select("#networkChart").append("circle")
                 .attr("class", "field")
                 .attr("cx", 1)
                 .attr("cy", width * .654)
-                .attr("r", (2/104)*width);
+                .attr("r", (2/104)*width)
+                .style("stroke-width", (width/1265) * 4 + "px");
             // Corner arc top right
             d3.select("#networkChart").append("circle")
                 .attr("class", "field")
                 .attr("cx", width-2)
                 .attr("cy", 1)
-                .attr("r", (2/104)*width);
+                .attr("r", (2/104)*width)
+                .style("stroke-width", (width/1265) * 4 + "px");
             // Corner arc bottom right
             d3.select("#networkChart").append("circle")
                 .attr("class", "field")
                 .attr("cx", width-2)
                 .attr("cy", width * .654)
-                .attr("r", (2/104)*width);
+                .attr("r", (2/104)*width)
+                .style("stroke-width", (width/1265) * 4 + "px");
             //key
             d3.select("#key")
                     .style("top", (width*.625) + "px")
